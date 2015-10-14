@@ -19,13 +19,14 @@
 
 		/*EXPERIMENT WITH DIFFERENT STYLING FOR THE CIRCLES AND WHAT HAPPENS WHEN THE MOUSE HOVERS OVER THEM*/
 		circle {
-			fill-opacity: .3;
-			fill: red;
-			stroke-width: 0px;
+			fill-opacity: 10;
+			fill: yellow;
+			stroke-width: .3px;
 		}
 		circle:hover {
-		  	stroke: black;
-		  	stroke-width: 2px;
+		  	stroke: white;
+		  	stroke-width: 2px
+		  	stroke-opacity: 50;
 		  	cursor: crosshair;
 		}
 
@@ -109,11 +110,11 @@
 
 		//uncomment for Mapbox implementation, and supply your own access token
 
-		// L.tileLayer('https://api.tiles.mapbox.com/v4/{mapid}/{z}/{x}/{y}.png?access_token={accessToken}', {
-		// 	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		// 	mapid: 'mapbox.light',
-		// 	accessToken: [INSERT YOUR TOKEN HERE!]
-		// }).addTo(map);
+		L.tileLayer('https://api.tiles.mapbox.com/v4/{mapid}/{z}/{x}/{y}.png?access_token={accessToken}', {
+		 	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		 	mapid: 'mapbox.light',
+		 	accessToken: ['pk.eyJ1IjoiaXAyMjg2IiwiYSI6ImNpZnI3ZTV1cWtlaXVzNG03YjdrY2pkbmQifQ.liSNOfiiGxYjYNLdv41KeA']
+		 }).addTo(map);
 
 		//create variables to store a reference to svg and g elements
 
