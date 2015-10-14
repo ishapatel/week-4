@@ -50,6 +50,11 @@
 			height: 500px;
 			background: rgba(255,255,255,.8);
 		}
+		em{
+    		color: red;
+    		font-weight: bold;
+			}
+
 	</style>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -69,13 +74,19 @@
 		<form>
 			<p><input id="heatmap" type="checkbox">Heat Map</p>
 			<p><input type="button" value="Update Data" onclick="updateData()"></p>
+		<p>Status: <em id="message"></em></p>
 		</form>
 	</div>
 
 
 	<script type="text/javascript">
 
-
+		var eventOutputContainer = document.getElementById("message");
+		var eventSrc = new EventSource("/eventSource");
+		eventSrc.onmessage = function(e) {
+    		console.log(e);
+    		eventOutputContainer.innerHTML = e.data;
+		};
 		var tooltip = d3.select("div.tooltip");
 		var tooltip_title = d3.select("#title");
 		var tooltip_price = d3.select("#price");
@@ -91,11 +102,11 @@
 
 		//uncomment for Mapbox implementation, and supply your own access token
 
-		// L.tileLayer('https://api.tiles.mapbox.com/v4/{mapid}/{z}/{x}/{y}.png?access_token={accessToken}', {
-		// 	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		// 	mapid: 'mapbox.light',
-		// 	accessToken: [INSERT YOUR TOKEN HERE!]
-		// }).addTo(map);
+		L.tileLayer('https://api.tiles.mapbox.com/v4/{mapid}/{z}/{x}/{y}.png?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		 	mapid: 'mapbox.light',
+		 	accessToken: ['pk.eyJ1IjoiaXAyMjg2IiwiYSI6ImNpZnI3ZTV1cWtlaXVzNG03YjdrY2pkbmQifQ.liSNOfiiGxYjYNLdv41KeA']
+		 }).addTo(map);
 
 		//create variables to store a reference to svg and g elements
 
