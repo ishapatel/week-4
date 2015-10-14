@@ -9,14 +9,51 @@
 		body {
 		    padding: 0;
 		    margin: 0;
+		    font-family: Helvetica, Arial, sans-serif;
+		    font-size: 12px;
+		    line-height: 18px;
 		}
 		html, body, #map {
 		    height: 100%;
 		}
 
 		circle {
+			fill-opacity: 100;
+			fill: red;
 			stroke: red;
 			stroke-width: 5px;
+		}
+		circle:hover {
+    		stroke: black;
+    		stroke-width: 2px;
+    		cursor: crosshair;
+    	}	
+		
+		div.tooltip{
+			padding: 6px;
+			background: white;
+			visibility: hidden;
+			position: absolute;
+			z-index: 10;			
+		}
+		p.tooltip-text{
+			margin: 0px;
+			padding: 0px;
+		}
+
+		div.menu{
+		    position: fixed;
+		    margin: 0px;
+		    padding: 10px;
+		    top: 0px;
+		    right: 0px;
+		    width: 250px;
+		    height: 500px;
+		    background: rgba(255,255,255,.8);
+		}
+		em{
+ 			color: red;
+    		font-weight: bold;
 		}
 	</style>
 
@@ -26,9 +63,35 @@
 <body>
 
 	<div id="map"></div>
+	<div id = "event"></div>
+	<script type="text/javascript">
+		var feature = d3.select("#event");
+	</script>
+	<div class="tooltip" style="position: absolute; visibility: hidden; z-index: 10; top: 100px; left: 100px">
+	    <p class="tooltip-text" id="title">This is the title</p>
+	    <p class="tooltip-text" id="price">This is the price</p>
+	</div>
+	
+	<div class="menu">
+    <p><h4>DMC Web Stack</h4></p>
+    <form>
+        <p><input type="checkbox" id="heatmap">Heat Map</p>
+        <p><input type="button" value="Update Data" onclick="updateData()"></p>
+    <p>Status: <em id="message"></em></p>
+    </form>
+	</div>
+
 
 	<script type="text/javascript">
-
+		var eventOutputContainer = document.getElementById("message");
+		var eventSrc = new EventSource("/eventSource");
+			eventSrc.onmessage = function(e) {
+			    console.log(e);
+			    eventOutputContainer.innerHTML = e.data;
+			};
+		var tooltip = d3.select("div.tooltip");
+		var tooltip_title = d3.select("#title");
+		var tooltip_price = d3.select("#price");
 		var map = L.map('map').setView([22.539029, 114.062076], 16);
 
 		//this is the OpenStreetMap tile implementation
@@ -62,6 +125,13 @@
 		var transform = d3.geo.transform({point: projectStream});
 		var path = d3.geo.path().projection(transform);
 
+	  	function updateData(){
+	  		var mapBounds = map.getBounds();
+	  		var lat1 = mapBounds["_southWest"]["lat"];
+			var lat2 = mapBounds["_northEast"]["lat"];
+			var lng1 = mapBounds["_southWest"]["lng"];
+			var lng2 = mapBounds["_northEast"]["lng"];
+			request = "/getData?lat1=" + lat1 + "&lat2=" + lat2 + "&lng1=" + lng1 + "&lng2=" + lng2
 	  	d3.json("/getData/", function(data) {
 
 			//create placeholder circle geometry and bind it to data
@@ -69,8 +139,18 @@
 
 			circles.enter()
 				.append("circle")
-			    .attr("r", 10);
-
+			    .attr("r", 10)
+			    .on("mouseover", function(d) {
+			        tooltip.style("visibility", "visible");
+			        tooltip_title.text(d.properties.name);
+			        tooltip_price.text("Price: " + d.properties.price);
+			    })
+			    .on("mousemove", function(){
+			        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+			    })
+			    .on("mouseout", function(){
+			        return tooltip.style("visibility", "hidden");
+			    });	
 			// function to update the data
 			function update() {
 
@@ -87,7 +167,7 @@
 			        .style("left", (topLeft[0] - buffer) + "px")
 			        .style("top", (topLeft[1] - buffer) + "px");
 
-			    g   .attr("transform", "translate(" + (-topLeft[0] + buffer) + "," + (-topLeft[1] + buffer) + ")");
+			    g 	.attr("transform", "translate(" + (-topLeft[0] + buffer) + "," + (-topLeft[1] + buffer) + ")");
 
 			    // update circle position and size
 			    circles
@@ -98,9 +178,11 @@
 			// call function to 
 			update();
 			map.on("viewreset", update);
-
 		});
 
+		};
+	
+	updateData();
 	</script>
 
 </body>
