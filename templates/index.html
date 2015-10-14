@@ -91,11 +91,11 @@
 
 		//uncomment for Mapbox implementation, and supply your own access token
 
-		// L.tileLayer('https://api.tiles.mapbox.com/v4/{mapid}/{z}/{x}/{y}.png?access_token={accessToken}', {
-		// 	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		// 	mapid: 'mapbox.light',
-		// 	accessToken: [INSERT YOUR TOKEN HERE!]
-		// }).addTo(map);
+		L.tileLayer('https://api.tiles.mapbox.com/v4/{mapid}/{z}/{x}/{y}.png?access_token={accessToken}', {
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		 	mapid: 'mapbox.light',
+		 	accessToken: ['pk.eyJ1IjoiaXAyMjg2IiwiYSI6ImNpZnI3ZTV1cWtlaXVzNG03YjdrY2pkbmQifQ.liSNOfiiGxYjYNLdv41KeA']
+		 }).addTo(map);
 
 		//create variables to store a reference to svg and g elements
 
@@ -115,7 +115,13 @@
 		var path = d3.geo.path().projection(transform);
 
 		function updateData(){
-		  	d3.json("/getData/", function(data) {
+			var mapBounds = map.getBounds();
+			var lat1 = mapBounds["_southWest"]["lat"];
+			var lat2 = mapBounds["_northEast"]["lat"];
+			var lng1 = mapBounds["_southWest"]["lng"];
+			var lng2 = mapBounds["_northEast"]["lng"];
+			request = "/getData?lat1=" + lat1 + "&lat2=" + lat2 + "&lng1=" + lng1 + "&lng2=" + lng2
+		  	d3.json(request, function(data) {
 
 				//create placeholder circle geometry and bind it to data
 				var circles = g.selectAll("circle").data(data.features);
